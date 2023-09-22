@@ -15,34 +15,7 @@ import {
 	FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-
-const formSchema = z.object({
-	firstName: z
-		.string()
-		.min(2, {
-			message: "First Name must be at least 2 characters",
-		})
-		.refine((val) => val.length > 0, {
-			message: "Please enter your first name",
-		}),
-	lastName: z
-		.string()
-		.min(2, {
-			message: "Last Name must be at least 2 characters",
-		})
-		.refine((val) => val.length > 0, {
-			message: "Please enter your last name",
-		}),
-	email: z
-		.string()
-		.email()
-		.min(5, {
-			message: "E-mail must be at least 5 characters",
-		})
-		.refine((val) => val.length > 0, {
-			message: "Please enter your email",
-		}),
-})
+import { formSchema } from "@/types/form"
 
 const ProfileForm = () => {
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -60,9 +33,44 @@ const ProfileForm = () => {
 		email: "johndoe@example.com",
 	}
 
-	function onSubmit(values: z.infer<typeof formSchema>) {
-		console.log(values)
+	async function onSubmit(values: z.infer<typeof formSchema>) {
+		const response = await fetch("/api/form", {
+			method: "POST",
+			body: JSON.stringify(values),
+			headers: {
+				"Content-Type": "application/json",
+			},
+		})
+		const responseData = await response.json()
+
+		if (!response.ok) {
+			throw new Error(responseData.message)
+		}
+
+		if (responseData.errors) {
+			const errors = responseData.errors
+			if (errors.email) {
+				form.setError("email", {
+					type: "server",
+					message: errors.email,
+				})
+			} else if (errors.firstName) {
+				form.setError("firstName", {
+					type: "server",
+					message: errors.firstName,
+				})
+			} else if (errors.lastName) {
+				form.setError("lastName", {
+					type: "server",
+					message: errors.lastName,
+				})
+			}
+		} else {
+			alert("Success!")
+			form.reset()
+		}
 	}
+
 	return (
 		<Form {...form}>
 			<form
@@ -105,8 +113,8 @@ const ProfileForm = () => {
 						)}
 					/>
 				))}
-				<Button type='submit' className=''>
-					Submit
+				<Button type='submit' disabled={form.formState.isSubmitting}>
+					{form.formState.isSubmitting ? "Submitting..." : "Submit"}
 				</Button>
 			</form>
 		</Form>
