@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { formSchema } from "@/types/form"
+import { toast, useToast } from "@/components/ui/use-toast"
 
 const ProfileForm = () => {
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -32,6 +33,8 @@ const ProfileForm = () => {
 		lastName: "Doe",
 		email: "johndoe@example.com",
 	}
+
+	const { toast } = useToast()
 
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		const response = await fetch("/api/form", {
@@ -66,17 +69,18 @@ const ProfileForm = () => {
 				})
 			}
 		} else {
-			alert("Success!")
-			form.reset()
+			return (
+				toast({
+					description: "Your form has been submitted!",
+				}),
+				form.reset()
+			)
 		}
 	}
 
 	return (
 		<Form {...form}>
-			<form
-				onSubmit={form.handleSubmit(onSubmit)}
-				className='grid gap-4 grid-cols-1'
-			>
+			<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
 				{Object.entries(formSchema.shape).map(([key, value]) => (
 					<FormField
 						key={key}
