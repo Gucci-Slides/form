@@ -6,6 +6,9 @@ export const formSchema = z.object({
 		.min(2, {
 			message: "First Name must be at least 2 characters",
 		})
+		.max(20, {
+			message: "First Name must be less than 20 characters",
+		})
 		.refine((val) => val.length > 0, {
 			message: "Please enter your first name",
 		}),
@@ -13,6 +16,9 @@ export const formSchema = z.object({
 		.string()
 		.min(2, {
 			message: "Last Name must be at least 2 characters",
+		})
+		.max(20, {
+			message: "Last Name must be less than 20 characters",
 		})
 		.refine((val) => val.length > 0, {
 			message: "Please enter your last name",
