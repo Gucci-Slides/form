@@ -24,7 +24,7 @@
 
 ## 📍 Overview
 
-A simple form to demonstrate passing data between server, client, and database layer.
+A simple form to demonstrate passing user input data across the client, server, and database layer.
 -  Type safety
 -  API Error handling 
 -  Input and Data Validation
