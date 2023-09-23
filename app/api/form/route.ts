@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import getAllForm from "@/lib/getAllForm"
 import { formSchema } from "@/types/form"
 import insertForm from "@/lib/insertForm"
+import { DatabaseError } from "@planetscale/database"
 
 export async function GET(request: Request) {
 	const forms = await getAllForm()
@@ -19,8 +20,26 @@ export async function POST(request: Request) {
 		})
 	}
 	if (results.success) {
-		await insertForm(results.data) // pass the form data to the insertForm function
-		return NextResponse.json({ success: true })
+		try {
+			await insertForm(results.data)
+			return NextResponse.json({ success: true })
+		} catch (error) {
+			if (
+				error instanceof DatabaseError &&
+				error.message.includes("Duplicate entry")
+			) {
+				return NextResponse.json(
+					{
+						errors: {
+							email: "Email already exists",
+							status: 409,
+						},
+					},
+					{ status: 409 }
+				)
+			}
+			throw error
+		}
 	}
 	return NextResponse.json({ errors: zodError })
 }

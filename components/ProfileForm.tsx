@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { formSchema } from "@/types/form"
 import { toast, useToast } from "@/components/ui/use-toast"
+import { NextResponse } from "next/server"
 
 const ProfileForm = () => {
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -44,12 +45,12 @@ const ProfileForm = () => {
 				"Content-Type": "application/json",
 			},
 		})
-		const responseData = await response.json()
-
 		if (!response.ok) {
-			throw new Error(responseData.message)
+			form.setError("root.serverError", {
+				type: response.status.toString(),
+			})
 		}
-
+		const responseData = await response.json()
 		if (responseData.errors) {
 			const errors = responseData.errors
 			if (errors.email) {
@@ -67,14 +68,17 @@ const ProfileForm = () => {
 					type: "server",
 					message: errors.lastName,
 				})
-			}
-		} else {
-			return (
+			} else
 				toast({
-					description: "Your form has been submitted!",
-				}),
-				form.reset()
-			)
+					title: "Error",
+					description: "An unknown error occurred",
+				})
+		}
+		if (responseData.success) {
+			toast({
+				title: "Success",
+				description: "You have successfully submitted the form",
+			})
 		}
 	}
 
