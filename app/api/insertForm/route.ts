@@ -1,14 +1,7 @@
-import { NextResponse } from "next/server"
-import getAllForm from "@/lib/getAllForm"
-import { formSchema } from "@/types/form"
 import insertForm from "@/lib/insertForm"
+import { formSchema } from "@/types/form"
 import { DatabaseError } from "@planetscale/database"
-
-export async function GET(request: Request) {
-	const forms = await getAllForm()
-
-	return NextResponse.json(forms)
-}
+import { NextResponse } from "next/server"
 
 export async function POST(request: Request) {
 	const body: unknown = await request.json()
