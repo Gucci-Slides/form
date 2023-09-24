@@ -28,17 +28,10 @@ const ProfileForm = () => {
 			email: "",
 		},
 	})
-
-	const descriptions: Record<string, string> = {
-		firstName: "John",
-		lastName: "Doe",
-		email: "johndoe@example.com",
-	}
-
 	const { toast } = useToast()
 
 	async function onSubmit(values: z.infer<typeof formSchema>) {
-		const response = await fetch("/api/form", {
+		const response = await fetch("/api/insertForm", {
 			method: "POST",
 			body: JSON.stringify(values),
 			headers: {
@@ -85,42 +78,51 @@ const ProfileForm = () => {
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
-				{Object.entries(formSchema.shape).map(([key, value]) => (
-					<FormField
-						key={key}
-						control={form.control}
-						name={key as keyof (typeof formSchema)["_def"]["shape"]}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>
-									{key
-										.replace(/([a-z])([A-Z])/g, "$1 $2")
-										.replace(
-											/([A-Z])([A-Z][a-z])/g,
-											"$1 $2"
-										)
-										.replace(/^./, (str) =>
-											str.toUpperCase()
-										)}
-								</FormLabel>
-								<FormControl>
-									<Input
-										placeholder={
-											descriptions[
-												key as keyof (typeof formSchema)["_def"]["shape"]
-											]
-										}
-										{...field}
-									/>
-								</FormControl>
-								<FormDescription>
-									{value._def?.description ?? ""}
-								</FormDescription>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				))}
+				<FormField
+					control={form.control}
+					name='firstName'
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>First Name</FormLabel>
+							<FormControl>
+								<Input placeholder='John' {...field} />
+							</FormControl>
+							<FormDescription></FormDescription>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+				<FormField
+					control={form.control}
+					name='lastName'
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Last Name</FormLabel>
+							<FormControl>
+								<Input placeholder='Doe' {...field} />
+							</FormControl>
+							<FormDescription></FormDescription>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+				<FormField
+					control={form.control}
+					name='email'
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Email</FormLabel>
+							<FormControl>
+								<Input
+									placeholder='johndoe@example.com'
+									{...field}
+								/>
+							</FormControl>
+							<FormDescription></FormDescription>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
 				<Button type='submit' disabled={form.formState.isSubmitting}>
 					{form.formState.isSubmitting ? "Submitting..." : "Submit"}
 				</Button>
